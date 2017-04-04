@@ -64,16 +64,6 @@ public class AdalFilter implements Filter {
 
 	}
 
-	private boolean checkNonAuthenticatedPaths(String pathParam) {
-		boolean result = false;
-		String[] items = nonauthenticatedpaths.split(",");
-		for(String pathX : Arrays.asList(items)){
-			logger.info("pathParam "+pathParam);
-			if(pathParam.endsWith(pathX))
-				return true;
-		}
-		return result;
-	}
 
 	// This filter is written for http requests
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -87,7 +77,6 @@ public class AdalFilter implements Filter {
 			String requestUri = httpRequest.getRequestURI();
 			
 			
-			if (!checkNonAuthenticatedPaths(requestUri.trim())) {
 
 
 				try {
@@ -147,9 +136,6 @@ public class AdalFilter implements Filter {
 					request.setAttribute("error", exc.getMessage());
 					httpResponse.sendRedirect(((HttpServletRequest) request).getContextPath() + "/error.jsp");
 				}
-			}else{
-				logger.info("no authentication for this request");
-			}
 		}
 		chain.doFilter(request, response);
 	}
