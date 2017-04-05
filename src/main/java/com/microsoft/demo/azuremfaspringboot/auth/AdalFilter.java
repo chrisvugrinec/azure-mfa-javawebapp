@@ -1,4 +1,4 @@
-package com.microsoft.demo.azuremfaspringboot;
+package com.microsoft.demo.azuremfaspringboot.auth;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -40,11 +40,11 @@ import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 
 @Configuration
-@Order(Ordered.HIGHEST_PRECEDENCE) 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class AdalFilter implements Filter {
 
 	private static final Logger logger = Logger.getLogger(AdalFilter.class.getName());
-			
+
 	@Value("${clientId}")
 	private String clientId;
 
@@ -52,90 +52,86 @@ public class AdalFilter implements Filter {
 	private String clientSecret;
 
 	@Value("${tenant}")
-	private String tenant; 
+	private String tenant;
 
 	@Value("${authority}")
 	private String authority;
-
-	@Value("${nonauthenticatedpaths}")
-	private String nonauthenticatedpaths = "/,/home";
 
 	public void destroy() {
 
 	}
 
-
 	// This filter is written for http requests
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		
-		
+
 		if (request instanceof HttpServletRequest) {
 
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
 			String requestUri = httpRequest.getRequestURI();
-			
-			
 
+			try {
 
-				try {
+				String currentUri = request.getScheme() + "://" + request.getServerName()
+						+ ("http".equals(request.getScheme()) && request.getServerPort() == 80
+								|| "https".equals(request.getScheme()) && request.getServerPort() == 443 ? ""
+										: ":" + request.getServerPort())
+						+ requestUri;
 
-					String currentUri = request.getScheme() + "://" + request.getServerName()
-							+ ("http".equals(request.getScheme()) && request.getServerPort() == 80
-									|| "https".equals(request.getScheme()) && request.getServerPort() == 443 ? "": ":" + request.getServerPort())+ requestUri;
-					
-					String fullUrl = currentUri + (httpRequest.getQueryString() != null ? "?" + httpRequest.getQueryString() : "");
-					// check if user has a session
-					if (!AuthHelper.isAuthenticated(httpRequest)) {
-						
-						if (AuthHelper.containsAuthenticationData(httpRequest)) {
-							Map<String, String> params = new HashMap<String, String>();
-							for (String key : request.getParameterMap().keySet()) {
-								params.put(key, request.getParameterMap().get(key)[0]);
-							}
-							AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl),
-									params);
-							if (AuthHelper.isAuthenticationSuccessful(authResponse)) {
+				String fullUrl = currentUri
+						+ (httpRequest.getQueryString() != null ? "?" + httpRequest.getQueryString() : "");
+				// check if user has a session
+				if (!AuthHelper.isAuthenticated(httpRequest)) {
 
-								AuthenticationSuccessResponse oidcResponse = (AuthenticationSuccessResponse) authResponse;
-								AuthenticationResult result = getAccessToken(oidcResponse.getAuthorizationCode(),currentUri);
-								createSessionPrincipal(httpRequest, result);
-							} else {
-								AuthenticationErrorResponse oidcResponse = (AuthenticationErrorResponse) authResponse;
-								throw new Exception(String.format("Request for auth code failed: %s - %s",
-										oidcResponse.getErrorObject().getCode(),
-										oidcResponse.getErrorObject().getDescription()));
-							}
+					if (AuthHelper.containsAuthenticationData(httpRequest)) {
+						Map<String, String> params = new HashMap<String, String>();
+						for (String key : request.getParameterMap().keySet()) {
+							params.put(key, request.getParameterMap().get(key)[0]);
+						}
+						AuthenticationResponse authResponse = AuthenticationResponseParser.parse(new URI(fullUrl),
+								params);
+						if (AuthHelper.isAuthenticationSuccessful(authResponse)) {
+
+							AuthenticationSuccessResponse oidcResponse = (AuthenticationSuccessResponse) authResponse;
+							AuthenticationResult result = getAccessToken(oidcResponse.getAuthorizationCode(),
+									currentUri);
+							createSessionPrincipal(httpRequest, result);
 						} else {
-							// not authenticated
-							httpResponse.setStatus(302);
-							httpResponse.sendRedirect(getRedirectUrl(currentUri));
-							return;
+							AuthenticationErrorResponse oidcResponse = (AuthenticationErrorResponse) authResponse;
+							throw new Exception(String.format("Request for auth code failed: %s - %s",
+									oidcResponse.getErrorObject().getCode(),
+									oidcResponse.getErrorObject().getDescription()));
 						}
 					} else {
-						// if authenticated, how to check for valid session?
-						AuthenticationResult result = AuthHelper.getAuthSessionObject(httpRequest);
+						// not authenticated
+						httpResponse.setStatus(302);
+						httpResponse.sendRedirect(getRedirectUrl(currentUri));
+						return;
+					}
+				} else {
+					// if authenticated, how to check for valid session?
+					AuthenticationResult result = AuthHelper.getAuthSessionObject(httpRequest);
 
-						if (httpRequest.getParameter("refresh") != null) {
-							result = getAccessTokenFromRefreshToken(result.getRefreshToken(), currentUri);
+					if (httpRequest.getParameter("refresh") != null) {
+						result = getAccessTokenFromRefreshToken(result.getRefreshToken(), currentUri);
+					} else {
+						if (httpRequest.getParameter("cc") != null) {
+							result = getAccessTokenFromClientCredentials();
 						} else {
-							if (httpRequest.getParameter("cc") != null) {
-								result = getAccessTokenFromClientCredentials();
-							} else {
-								if (result.getExpiresOnDate().before(new Date())) {
-									result = getAccessTokenFromRefreshToken(result.getRefreshToken(), currentUri);
-								}
+							if (result.getExpiresOnDate().before(new Date())) {
+								result = getAccessTokenFromRefreshToken(result.getRefreshToken(), currentUri);
 							}
 						}
-						createSessionPrincipal(httpRequest, result);
 					}
-
-				} catch (Throwable exc) {
-					httpResponse.setStatus(500);
-					request.setAttribute("error", exc.getMessage());
-					httpResponse.sendRedirect(((HttpServletRequest) request).getContextPath() + "/error.jsp");
+					createSessionPrincipal(httpRequest, result);
 				}
+
+			} catch (Throwable exc) {
+				httpResponse.setStatus(500);
+				request.setAttribute("error", exc.getMessage());
+				httpResponse.sendRedirect(((HttpServletRequest) request).getContextPath() + "/error.jsp");
+			}
 		}
 		chain.doFilter(request, response);
 	}
@@ -220,16 +216,16 @@ public class AdalFilter implements Filter {
 				+ "/oauth2/authorize?response_type=code%20id_token&scope=openid&response_mode=form_post&redirect_uri="
 				+ URLEncoder.encode(currentUri, "UTF-8") + "&client_id=" + clientId
 				+ "&resource=https%3a%2f%2fgraph.windows.net" + "&nonce=" + UUID.randomUUID() + "&site_id=500879";
-		logger.info("redirect url: "+redirectUrl);
+		logger.info("redirect url: " + redirectUrl);
 		return redirectUrl;
 	}
 
 	public void init(FilterConfig config) throws ServletException {
 		// Values already configured with properties
-        logger.info("clientId = "+this.clientId);
-        logger.info("authority = "+this.authority);
-        logger.info("tenant = "+this.tenant);
-        logger.info("clientSecret = "+this.clientSecret);
+		logger.info("clientId = " + this.clientId);
+		logger.info("authority = " + this.authority);
+		logger.info("tenant = " + this.tenant);
+		logger.info("clientSecret = " + this.clientSecret);
 	}
 
 }
