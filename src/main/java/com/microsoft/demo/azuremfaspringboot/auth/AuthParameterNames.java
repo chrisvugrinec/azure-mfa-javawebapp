@@ -21,12 +21,12 @@ package com.microsoft.demo.azuremfaspringboot.auth;
 
 public final class AuthParameterNames {
 
-    private AuthParameterNames() {
-    }
+	private AuthParameterNames() {
+	}
 
-    public static String ERROR = "error";
-    public static String ERROR_DESCRIPTION = "error_description";
-    public static String ERROR_URI = "error_uri";
-    public static String ID_TOKEN = "id_token";
-    public static String CODE = "code";
+	public static String ERROR = "error";
+	public static String ERROR_DESCRIPTION = "error_description";
+	public static String ERROR_URI = "error_uri";
+	public static String ID_TOKEN = "id_token";
+	public static String CODE = "code";
 }

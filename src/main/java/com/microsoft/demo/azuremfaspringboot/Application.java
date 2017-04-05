@@ -1,6 +1,5 @@
 package com.microsoft.demo.azuremfaspringboot;
 
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
@@ -33,8 +33,7 @@ public class Application {
 		AdalFilter adalFilter = new AdalFilter();
 		beanFactory.autowireBean(adalFilter);
 		registration.setFilter(adalFilter);
-		String[] items = authenticatedpaths.split(",");
-		for (String path : Arrays.asList(items)) {
+		for (String path : authenticatedpaths.split(",")) {
 			registration.addUrlPatterns(path);
 			logger.log(Level.INFO, "adding path: {0} to path", path);
 		}

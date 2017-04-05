@@ -18,9 +18,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/").permitAll()
 				// .and().csrf()
 				// .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-				// .anyRequest().authenticated()
 				.and().csrf().disable();
-		//
+		// .anyRequest().authenticated()
 		// .filterSecurityInterceptorOncePerRequest(true)
 		// .and().addFilterAt(new AdalFilter(),BasicAuthenticationFilter.class);
 	}
