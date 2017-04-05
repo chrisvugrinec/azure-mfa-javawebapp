@@ -20,29 +20,26 @@ public class Application {
 	private @Autowired AutowireCapableBeanFactory beanFactory;
 	private static final Logger logger = Logger.getLogger(Application.class.getName());
 
-
 	@Value("${authenticatedpaths}")
 	private String authenticatedpaths;
 
-    public static void main(String[] args) throws Throwable {
-        SpringApplication.run(Application.class, args);
-    }
-    
-	
-    @Bean
-    public FilterRegistrationBean adalFilter(){
-    	FilterRegistrationBean registration = new FilterRegistrationBean();
-    	AdalFilter adalFilter = new AdalFilter();
-    	beanFactory.autowireBean(adalFilter);
-    	registration.setFilter(adalFilter);
-    	String[] items = authenticatedpaths.split(",");
-    	for(String path : Arrays.asList(items)){
-        	registration.addUrlPatterns(path);
-        	logger.log(Level.INFO, "adding path: {0} to path", path);
-    	}
-    	registration.setOrder(1);
-    	return registration;
-    }
+	public static void main(String[] args) throws Throwable {
+		SpringApplication.run(Application.class, args);
+	}
 
-    
+	@Bean
+	public FilterRegistrationBean adalFilter() {
+		FilterRegistrationBean registration = new FilterRegistrationBean();
+		AdalFilter adalFilter = new AdalFilter();
+		beanFactory.autowireBean(adalFilter);
+		registration.setFilter(adalFilter);
+		String[] items = authenticatedpaths.split(",");
+		for (String path : Arrays.asList(items)) {
+			registration.addUrlPatterns(path);
+			logger.log(Level.INFO, "adding path: {0} to path", path);
+		}
+		registration.setOrder(1);
+		return registration;
+	}
+
 }

@@ -15,20 +15,17 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ApplicationTests {
-	
-    @Autowired
-    private MockMvc mockMvc;
 
+	@Autowired
+	private MockMvc mockMvc;
 
-    @Test
-    public void accessUnsecuredResourceThenOk() throws Exception {
-        mockMvc.perform(get("/"))
-            .andExpect(status().isOk());
-    }
+	@Test
+	public void accessUnsecuredResourceThenOk() throws Exception {
+		mockMvc.perform(get("/")).andExpect(status().isOk());
+	}
 
-    @Test
-    public void accessSecuredResourceUnauthenticatedThenRedirects() throws Exception {
-        mockMvc.perform(get("/hello"))
-            .andExpect(status().is3xxRedirection());
-    }
+	@Test
+	public void accessSecuredResourceUnauthenticatedThenRedirects() throws Exception {
+		mockMvc.perform(get("/hello")).andExpect(status().is3xxRedirection());
+	}
 }

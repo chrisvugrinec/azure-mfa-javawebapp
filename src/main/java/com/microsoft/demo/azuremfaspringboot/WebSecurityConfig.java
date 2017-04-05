@@ -10,23 +10,19 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-	
-	
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        
-    	
-    	//	TODO: findout how to enable CSRF
-    	http
-        .authorizeRequests()
-            .antMatchers("/").permitAll()
-            //.and().csrf()
-            //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-            //.anyRequest().authenticated()
-           .and().csrf().disable();
-           // 
-           // .filterSecurityInterceptorOncePerRequest(true)
-           // .and().addFilterAt(new AdalFilter(),BasicAuthenticationFilter.class);        
-    }
-        
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+
+		// TODO: findout how to enable CSRF
+		http.authorizeRequests().antMatchers("/").permitAll()
+				// .and().csrf()
+				// .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+				// .anyRequest().authenticated()
+				.and().csrf().disable();
+		//
+		// .filterSecurityInterceptorOncePerRequest(true)
+		// .and().addFilterAt(new AdalFilter(),BasicAuthenticationFilter.class);
+	}
+
 }
