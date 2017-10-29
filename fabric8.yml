@@ -1,0 +1,12 @@
+---
+buildName: "azure-mfa-javawebapp"
+links:
+  Git: "https://github.com/chrisvugrinec/azure-mfa-javawebapp.git"
+  Job: "http://10.0.20.243:80/job/azure-mfa-javawebapp"
+  Production: "http://10.0.61.105:80/kubernetes/pods?namespace=default-prod"
+  Staging: "http://10.0.61.105:80/kubernetes/pods?namespace=default-staging"
+  Testing: "http://10.0.61.105:80/kubernetes/pods?namespace=default-testing"
+environments:
+  Testing: "default-testing"
+  Staging: "default-staging"
+  Production: "default-prod"
