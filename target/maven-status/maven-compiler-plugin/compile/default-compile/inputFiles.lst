@@ -1,0 +1,8 @@
+/Users/chris/Documents/workspace_ms/microsoft_azure/azure-mfa-javawebapp/src/main/java/com/microsoft/demo/azuremfaspringboot/auth/AuthHelper.java
+/Users/chris/Documents/workspace_ms/microsoft_azure/azure-mfa-javawebapp/src/main/java/com/microsoft/demo/azuremfaspringboot/Application.java
+/Users/chris/Documents/workspace_ms/microsoft_azure/azure-mfa-javawebapp/src/main/java/com/microsoft/demo/azuremfaspringboot/auth/AdalFilter.java
+/Users/chris/Documents/workspace_ms/microsoft_azure/azure-mfa-javawebapp/src/main/java/com/microsoft/demo/azuremfaspringboot/WebSecurityConfig.java
+/Users/chris/Documents/workspace_ms/microsoft_azure/azure-mfa-javawebapp/src/main/java/com/microsoft/demo/azuremfaspringboot/controllers/WebController.java
+/Users/chris/Documents/workspace_ms/microsoft_azure/azure-mfa-javawebapp/src/main/java/com/microsoft/demo/azuremfaspringboot/controllers/WebErrorController.java
+/Users/chris/Documents/workspace_ms/microsoft_azure/azure-mfa-javawebapp/src/main/java/com/microsoft/demo/azuremfaspringboot/auth/AuthParameterNames.java
+/Users/chris/Documents/workspace_ms/microsoft_azure/azure-mfa-javawebapp/src/main/java/com/microsoft/demo/azuremfaspringboot/MvcConfig.java
