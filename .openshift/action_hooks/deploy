@@ -27,6 +27,6 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 cd $OPENSHIFT_REPO_DIR
 
-
+echo "HELLO WORLD"
 $M2/mvn --version
 $M2/mvn -s settings.xml clean install
